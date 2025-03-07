@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fruits Index</title>
+</head>
+<body>
+    <h1>All Fruits</h1>
+    <nav>
+        <ul>
+          <li>
+            <a href="/fruits/new">Add New Fruit</a>
+          </li>
+          <li>
+            <a href="/">Home page</a>
+          </li>
+        </ul>
+      </nav>
+      <ul>
+        <% fruits.forEach(fruit => { %>
+        <li><%= fruit.name %></li>
+        <% }); %>
+      </ul>
+    
+</body>
+</html>
