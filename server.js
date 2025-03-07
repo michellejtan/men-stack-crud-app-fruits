@@ -7,12 +7,23 @@ const mongoose = require("mongoose"); // require package, so we can use it to co
 const methodOverride = require("method-override"); // new
 const morgan = require("morgan"); //new
 
+// new code below this line
+const path = require("path");
+
+
+
 // Import the Fruit model
 const Fruit = require("./models/fruit.js"); // according to Dan, expert, NOT GA;  
 // this require happens after we establish a connection to our MongoDB instance.
 
 // initialize the express application
 const app = express();
+
+// now I can use use app.use
+// static asset middleware - used to sent static assets ()
+//  new code below this line 
+//  app.use(express.static(path.join(__dirname, "public")));  //for older version &if in the root no need to have that path
+app.use(express.static('public'));
 
 // config code
 dotenv.config(); // Loads the environment variables from .env file, Dan like it here under dependencies
@@ -39,7 +50,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(methodOverride("_method")); // new
 // method override reads the "_method" query param for
 // DELETE or PUT requests
-app.use(morgan("dev")); //new
+// app.use(morgan("dev")); //new
 
 
 // GET /
@@ -116,6 +127,41 @@ app.delete("/fruits/:fruitId", async (req, res) => {
     res.redirect("/fruits"); //why redirect, for ui purpose
 });
 
+
+// edit route - used to send a page to the client with
+// an edit form pre-filled out with fruit details
+// so ther user can edit the fruit and submit the form
+// GET localhost:3000/fruits/:fruitId/edit
+app.get("/fruits/:fruitId/edit", async (req, res) => {
+    // 1 . look up the fruit by it's id
+    const foundFruit = await Fruit.findById(req.params.fruitId);
+    console.log(foundFruit);
+    // 2. respond with a "edit" template with an edit form
+    // res.send(`This is the edit route for ${foundFruit.name}`);
+    res.render("fruits/edit.ejs", {
+        fruit: foundFruit,
+    });
+  });
+  
+
+  // server.js
+// update route -used to capture edit form submissions
+// from the client and send updates to MongoDB
+app.put("/fruits/:fruitId", async (req, res) => {
+    // Handle the 'isReadyToEat' checkbox data
+    if (req.body.isReadyToEat === "on") {
+      req.body.isReadyToEat = true;
+    } else {
+      req.body.isReadyToEat = false;
+    }
+    
+    // Update the fruit in the database
+    await Fruit.findByIdAndUpdate(req.params.fruitId, req.body);
+  
+    // Redirect to the fruit's show page to see the updates
+    res.redirect(`/fruits/${req.params.fruitId}`);
+  });
+  
 
 app.listen(3000, () => {
     console.log('Listening on port 3000');
