@@ -4,6 +4,9 @@ const dotenv = require("dotenv"); // require package
 // We begin by loading Express
 const express = require('express');
 const mongoose = require("mongoose"); // require package, so we can use it to connect to our database
+const methodOverride = require("method-override"); // new
+const morgan = require("morgan"); //new
+
 // Import the Fruit model
 const Fruit = require("./models/fruit.js"); // according to Dan, expert, NOT GA;  
 // this require happens after we establish a connection to our MongoDB instance.
@@ -23,7 +26,7 @@ mongoose.connect(process.env.MONGODB_URI);
 // log connection status to terminal on start
 mongoose.connection.on("connected", () => {
     console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
-  });
+});
 
 //   mount middleware functions here
 
@@ -31,6 +34,13 @@ mongoose.connection.on("connected", () => {
 // and decodes it into req.body so we can access form data!
 app.use(express.urlencoded({ extended: false }));
 // Dan never need to turn it off, the  "false"
+// Mount it along with our other middleware, ABOVE the routes
+
+app.use(methodOverride("_method")); // new
+// method override reads the "_method" query param for
+// DELETE or PUT requests
+app.use(morgan("dev")); //new
+
 
 // GET /
 // Root path/route "HomePage"
@@ -39,10 +49,10 @@ app.get("/", async (req, res) => {
     // allows us to render our EJS template as HTML
     res.render("index.ejs");
 
-  });
+});
 
-  // path to the page with a form we can fill out
-  // and submit to add anew fruit to the database
+// path to the page with a form we can fill out
+// and submit to add anew fruit to the database
 // GET /fruits/new
 app.get("/fruits/new", (req, res) => {
     // res.send("This route sends the user a form page!");
@@ -50,7 +60,7 @@ app.get("/fruits/new", (req, res) => {
 
     res.render("fruits/new.ejs"); //<-- relative file path
 
-  });
+});
 
 // Path used to receive form submissions
 // POST /fruits
@@ -70,11 +80,11 @@ app.post("/fruits", async (req, res) => {
     // redirect tells the client to navigate to 
     // a new URL path/another page
     // no template engineer, make client ...
-    
+
     // res.redirect("/fruits/new"); //<--  URL  path!
     res.redirect("/fruits"); //<--  URL  path!
 
-  });
+});
 
 // GET /fruits
 // index route for fruits - sends a page that lists
@@ -84,20 +94,29 @@ app.get("/fruits", async (req, res) => {
     console.log(allFruits);
     // res.send("Welcome to the index page"); // will cause error if send and render at the same time
     //pass to render a context object, gives the page the information it needs
-    res.render("fruits/index.ejs", {fruits: allFruits});
+    res.render("fruits/index.ejs", { fruits: allFruits });
 });
 
 
 // SHOW
-  app.get("/fruits/:fruitId", async (req, res) => {
+app.get("/fruits/:fruitId", async (req, res) => {
     const foundFruit = await Fruit.findById(req.params.fruitId);
     // res.send(
     //     `This route renders the show page for fruit id: ${req.params.fruitId}!`
     //   );
     res.render("fruits/show.ejs", { fruit: foundFruit });
-  });
-  
-  
+});
+
+// delete route, once matched by server.js, sends a 
+// action to MongDB to delete a document using it's id to find and delelte it
+app.delete("/fruits/:fruitId", async (req, res) => {
+    // res.send("This is the delete route");
+
+    await Fruit.findByIdAndDelete(req.params.fruitId);
+    res.redirect("/fruits"); //why redirect, for ui purpose
+});
+
+
 app.listen(3000, () => {
-  console.log('Listening on port 3000');
+    console.log('Listening on port 3000');
 });
