@@ -7,6 +7,17 @@
 </head>
 <body>
     <h1>Create a New Fruit!</h1>
+
+    <nav>
+        <ul>
+            <li>
+                <a href="/fruits">Browse/Back to Fruits</a>
+            </li>
+            <li>
+                <a href="/fruits/new">Add a New Fruit</a>
+            </li>
+        </ul>
+    </nav>
     <form action="/fruits" method="post">
         <label for="name">Name:</label>
         <input type="text" name="name" id="name" />
@@ -16,15 +27,6 @@
     
         <button type="submit">Add Fruit</button>
     </form>
-    <nav>
-        <ul>
-            <li>
-                <a href="/fruits">Browse Fruits</a>
-            </li>
-            <li>
-                <a href="/fruits/new">Add a New Fruit</a>
-            </li>
-        </ul>
-    </nav>
+
 </body>
 </html>
