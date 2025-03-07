@@ -58,11 +58,12 @@ app.post("/fruits", async (req, res) => {
     // conditional logic to handle the 
     // default behavior of HTML form checkbox fields
     // we do this when we need a boolean instead of a string
-    if (req.body.isReadyToEat === "on") {
-        req.body.isReadyToEat = true;
-      } else {
-        req.body.isReadyToEat = false;
-      }
+    // if (req.body.isReadyToEat === "on") {
+    //     req.body.isReadyToEat = true;
+    //   } else {
+    //     req.body.isReadyToEat = false;
+    //   }
+    req.body.isReadyToEat = !!req.body.isReadyToEat;
     // create the data in our database
     await Fruit.create(req.body);
     console.log(req.body);
@@ -70,7 +71,9 @@ app.post("/fruits", async (req, res) => {
     // a new URL path/another page
     // no template engineer, make client ...
     
-    res.redirect("/fruits/new"); //<--  URL  path!
+    // res.redirect("/fruits/new"); //<--  URL  path!
+    res.redirect("/fruits"); //<--  URL  path!
+
   });
 
 // GET /fruits
